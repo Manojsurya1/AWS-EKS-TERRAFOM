@@ -10,7 +10,7 @@ resource "aws_vpc" "MS_vpc" {
   }
 }
 
-resource "aws_subnet" "devopsshack_subnet" {
+resource "aws_subnet" "MS_subnet" {
   count = 2
   vpc_id                  = aws_vpc.MS_vpc.id
   cidr_block              = cidrsubnet(aws_vpc.MS_vpc.cidr_block, 8, count.index)
@@ -22,7 +22,7 @@ resource "aws_subnet" "devopsshack_subnet" {
   }
 }
 
-resource "aws_internet_gateway" "devopsshack_igw" {
+resource "aws_internet_gateway" "MS_igw" {
   vpc_id = aws_vpc.MS_vpc.id
 
   tags = {
@@ -30,7 +30,7 @@ resource "aws_internet_gateway" "devopsshack_igw" {
   }
 }
 
-resource "aws_route_table" "devopsshack_route_table" {
+resource "aws_route_table" "MS_route_table" {
   vpc_id = aws_vpc.MS_vpc.id
 
   route {
@@ -49,7 +49,7 @@ resource "aws_route_table_association" "a" {
   route_table_id = aws_route_table.MS_route_table.id
 }
 
-resource "aws_security_group" "devopsshack_cluster_sg" {
+resource "aws_security_group" "MS_cluster_sg" {
   vpc_id = aws_vpc.MS_vpc.id
 
   egress {
@@ -65,7 +65,7 @@ resource "aws_security_group" "devopsshack_cluster_sg" {
 }
 
 resource "aws_security_group" "MS_node_sg" {
-  vpc_id = aws_vpc.devopsshack_vpc.id
+  vpc_id = aws_vpc.MS_vpc.id
 
   ingress {
     from_port   = 0
@@ -98,7 +98,7 @@ resource "aws_eks_cluster" "MS" {
 
 resource "aws_eks_node_group" "MS" {
   cluster_name    = aws_eks_cluster.MS.name
-  node_group_name = "devopsshack-node-group"
+  node_group_name = "MS-node-group"
   node_role_arn   = aws_iam_role.MS_node_group_role.arn
   subnet_ids      = aws_subnet.MS_subnet[*].id
 
@@ -141,7 +141,7 @@ resource "aws_iam_role_policy_attachment" "MS_cluster_role_policy" {
 }
 
 resource "aws_iam_role" "MS_node_group_role" {
-  name = "devopsshack-node-group-role"
+  name = "MS-node-group-role"
 
   assume_role_policy = <<EOF
 {
